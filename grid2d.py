@@ -10,7 +10,9 @@ class Grid:
         self.x_dimension = x_dimension
         self.y_dimension = y_dimension
 
-        self.midpoints, self.interface_points = self.create_grid()
+
+        self.midpoints = self.create_grid_midpoints()
+        self.x_intersection_points, self.y_intersection_points = self.create_grid_interface_points()
 
         self.x_segment_length = self.midpoints[0, 1] - self.midpoints[0, 0]
         self.y_segment_length = self.midpoints[1, 0] - self.midpoints[0, 0]
@@ -18,40 +20,52 @@ class Grid:
         self.temperatures = np.zeros((x_dimension+2, y_dimension+2))
         self.boundary_condition = None
 
+    def create_grid_midpoints(self) -> np.ndarray:
+        """Creates a grid storing coordinate points.  Includes coordinate points of the boundary."""
 
-    def create_grid(self) -> tuple[np.ndarray, np.ndarray]:
-        """Creates a grid storing coordinate points. Includes coordinate points of boundary."""
+        # dimensions +2 to include the coordinates of the boundary cells
+        grid_midpoints = np.zeros((self.x_dimension + 2, self.y_dimension + 2, 2))
 
-        def create_midpoints() -> np.ndarray:
+        # fills the numpy array with coordinates of cell midpoints, including boundary cell midpoints
+        for x_index in range(self.x_dimension + 2):
+            grid_midpoints[:, x_index, 0] = x_index - (self.x_dimension + 2 - 1) / 2
+            for y_index in range(self.y_dimension + 2):
+                grid_midpoints[y_index, x_index, 1] = -1 * (y_index - (self.y_dimension + 2 - 1) / 2)
 
-            #dimensions +2 to include the coordinates of the boundary cells
-            grid_midpoints = np.zeros((self.x_dimension+2, self.y_dimension+2, 2))
+        return grid_midpoints
 
-            # fills the numpy array with coordinates of cell midpoints, including boundary cell midpoints
-            for x_index in range(self.x_dimension+2):
-                grid_midpoints[:, x_index, 0] = x_index - (self.x_dimension+2 - 1) / 2
-                for y_index in range(self.y_dimension+2):
-                    grid_midpoints[y_index, x_index, 1] = -1 * (y_index - (self.y_dimension+2 - 1) / 2)
 
-            return grid_midpoints
+    def create_grid_interface_points(self) -> tuple[np.ndarray, np.ndarray]:
+        """Creates two 2d numpy arrays.  One for coordinates of grid interface points on the x-axis,
+            and one for grid interface points on the y-axis."""
 
-        def create_interface_points() -> np.ndarray:
 
-            #dimensions +1 because we don't calculate exchange between boundary cells
-            grid_interface_points = np.zeros((self.x_dimension + 1, self.y_dimension + 1, 2))
+        def create_x_interfaces() -> np.ndarray:
 
-            # fills a numpy array with interface points between cells
-            for x_index in range(self.x_dimension + 1):
-                grid_interface_points[:, x_index, 0] = x_index - self.x_dimension / 2
-                for y_index in range(self.y_dimension + 1):
-                    grid_interface_points[y_index, x_index, 1] = -1 * y_index - self.y_dimension / 2
+            grid_x_interfaces = np.zeros((self.y_dimension, self.x_dimension+1, 2))
 
-            return grid_interface_points
+            for x_index in range(self.x_dimension+1):
+                grid_x_interfaces[:, x_index, 0] = x_index - (self.x_dimension/2)
 
-        midpoints = create_midpoints()
-        interface_points = create_interface_points()
+                for y_index in range(self.y_dimension):
+                    grid_x_interfaces[y_index, x_index, 1] = self.midpoints[y_index, np.random.choice(self.midpoints[1]), 1]
 
-        return midpoints, interface_points
+
+            return grid_x_interfaces
+
+        def create_y_interfaces() -> np.ndarray:
+
+            grid_y_interfaces = np.zeros((self.y_dimension+1, self.x_dimension, 2))
+
+            for y_index in range(self.y_dimension+1):
+                grid_y_interfaces[y_index, :, 1] = y_index + (self.y_dimension/2)
+                for x_index in range(self.x_dimension):
+                    grid_y_interfaces[y_index, x_index, 0] = self.midpoints[np.random.choice(self.midpoints[0]), x_index, 0]
+
+            return grid_y_interfaces
+
+
+        return create_x_interfaces(), create_y_interfaces()
 
 
     def set_initial_temperatures(self, temperatures: np.ndarray) -> None:

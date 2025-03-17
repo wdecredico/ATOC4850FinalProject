@@ -61,6 +61,26 @@ class GreybodyConservationOfEnergyEquation(DyDtEquation):
         #returns in units of kelvin/second
         return dTdt
 
+class XDirectionDiffusion(DyDtEquation):
+
+    def __init__(self, diffusion_constant: float, grid: Grid):
+
+        self.diffusion_constant = diffusion_constant
+        self.grid = grid
+
+    def __call__(self, time, temperature):
+
+        # temperature change across cells in the x direction
+        dt_dx = np.zeros(self.grid.x_intersection_points.shape)
+        dt_dx = (self.grid.temperatures[1:-1, 1:] - self.grid.temperatures[1:-1, :-1]) / self.grid.x_segment_length
+
+        x_direction_flux = -1 * self.diffusion_constant * dt_dx
+
+        incoming_shortwave_radiation = Constants.SOLAR_IRRADIANCE / 4 * (1 - Constants.EARTH_ALBEDO)
+        outgoing_longwave_radiation = (1 - Constants.EMISSIVITY / 2) * Constants.STEFAN_BOLTZMANN_CONSTANT * temperature**4
+        # x_direction_diffusion = -1 * x_direction_flux[]
+
+        return
 
 class DiffusionTemperatureChange(DyDtEquation):
 
@@ -79,11 +99,13 @@ class DiffusionTemperatureChange(DyDtEquation):
 
 
         #temperature change across cells in the x direction
-        dt_dx = np.zeros(self.grid.interface_points.shape)
-        dt_dx[:] = (self.grid.temperatures[:, 1:] - self.grid.temperatures[:, 0:-1]) / self.grid.x_segment_length
+        dt_dx = np.zeros(self.grid.x_intersection_points.shape)
+        dt_dx = (self.grid.temperatures[1:-1, 2:]  - self.grid.temperatures[1:-1, :-2]) / self.grid.x_segment_length
+
+
 
         #temperature change across cells in the y direction
-        dt_dy = np.zeros(self.grid.interface_points.shape)
+        dt_dy = np.zeros(self.grid.y_intersection_points.shape)
         dt_dy[:] = (self.grid.temperatures[1:, :] - self.grid.temperatures[0:-1, :]) / self.grid.y_segment_length
 
         x_direction_flux = -1 * self.diffusion_constant * dt_dx
@@ -96,6 +118,7 @@ class DiffusionTemperatureChange(DyDtEquation):
         #x_direction_diffusion = -1 * x_direction_flux[]
 
         return
+
 
 
 

@@ -17,20 +17,20 @@ class Grid:
         self.x_segment_length = self.midpoints[0, 1] - self.midpoints[0, 0]
         self.y_segment_length = self.midpoints[1, 0] - self.midpoints[0, 0]
 
-        self.temperatures = np.zeros((x_dimension+2, y_dimension+2))
+        self.temperatures = np.zeros((y_dimension+2, x_dimension+2))
         self.boundary_condition = None
 
     def create_grid_midpoints(self) -> np.ndarray:
         """Creates a grid storing coordinate points.  Includes coordinate points of the boundary."""
 
         # dimensions +2 to include the coordinates of the boundary cells
-        grid_midpoints = np.zeros((self.x_dimension + 2, self.y_dimension + 2, 2))
+        grid_midpoints = np.zeros((self.y_dimension + 2, self.x_dimension + 2, 2))
 
         # fills the numpy array with coordinates of cell midpoints, including boundary cell midpoints
         for x_index in range(self.x_dimension + 2):
-            grid_midpoints[:, x_index, 0] = x_index - (self.x_dimension + 2 - 1) / 2
+            grid_midpoints[:, x_index, 0] = x_index - (self.x_dimension + 1) / 2
             for y_index in range(self.y_dimension + 2):
-                grid_midpoints[y_index, x_index, 1] = -1 * (y_index - (self.y_dimension + 2 - 1) / 2)
+                grid_midpoints[y_index, x_index, 1] = -1 * (y_index - (self.y_dimension + 1) / 2)
 
         return grid_midpoints
 
@@ -48,7 +48,7 @@ class Grid:
                 grid_x_interfaces[:, x_index, 0] = x_index - (self.x_dimension/2)
 
                 for y_index in range(self.y_dimension):
-                    grid_x_interfaces[y_index, x_index, 1] = self.midpoints[y_index, np.random.choice(self.midpoints[1]), 1]
+                    grid_x_interfaces[y_index, x_index, 1] = -1 * (y_index - (self.y_dimension - 1) / 2)
 
 
             return grid_x_interfaces
@@ -57,10 +57,12 @@ class Grid:
 
             grid_y_interfaces = np.zeros((self.y_dimension+1, self.x_dimension, 2))
 
-            for y_index in range(self.y_dimension+1):
-                grid_y_interfaces[y_index, :, 1] = y_index + (self.y_dimension/2)
-                for x_index in range(self.x_dimension):
-                    grid_y_interfaces[y_index, x_index, 0] = self.midpoints[np.random.choice(self.midpoints[0]), x_index, 0]
+            for x_index in range(self.x_dimension):
+                grid_y_interfaces[:, x_index, 0] = x_index - (self.x_dimension - 1)/2
+
+                for y_index in range(self.y_dimension+1):
+                    grid_y_interfaces[y_index, x_index, 1] = -1 * (y_index - (self.y_dimension/2))
+
 
             return grid_y_interfaces
 
@@ -69,11 +71,24 @@ class Grid:
 
 
     def set_initial_temperatures(self, temperatures: np.ndarray) -> None:
-        """Sets initial temperature based on a 2d numpy array passed in."""
+        """Sets initial temperature based on a 2d numpy array passed in.
+            temperatures must be a 2d numpy array with size [y_dimension, x_dimension]"""
+
+        #check that input is the right size
+        if not temperatures.shape == (self.y_dimension, self.x_dimension):
+            print("Input of initial temperatures is not the correct shape.")
 
         self.temperatures[1:-1, 1:-1] = temperatures
 
     def set_boundary(self, boundary: np.ndarray) -> None:
+        """Sets the boundary conditions. Input must be a 2d numpy array
+            with size (y_dimension+2, x_dimension+2)"""
+
+
+        #check that the input is the right size
+        if not boundary.shape == (self.y_dimension+2, self.x_dimension+2):
+            print("Input of boundary is not the correct shape.")
+
 
         self.temperatures[:, 0] = boundary[:, 0]
         self.temperatures[:, -1] = boundary[:, -1]

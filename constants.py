@@ -19,6 +19,10 @@ class Constants:
     SECONDS_PER_DAY = HOURS_PER_DAY * SECONDS_PER_HOUR
     SECONDS_PER_YEAR = DAYS_PER_YEAR * SECONDS_PER_DAY
 
+    # renamed for readability in naming end time
+    DAYS = SECONDS_PER_DAY
+    YEARS = SECONDS_PER_YEAR
+
     SOLAR_INSOLATION = 1361  # in W m-2
     DEGREES_TO_RADIANS = np.pi / 180.0
 

@@ -6,7 +6,7 @@ class Grid:
 
     def __init__(self, x_dimension: int, y_dimension: int):
 
-        self.x_dimension: int = x_dimension
+        self.x_dimension = x_dimension
         self.y_dimension = y_dimension
 
         self.midpoints = self.create_grid_midpoints()
@@ -22,6 +22,11 @@ class Grid:
 
     def create_grid_midpoints(self) -> np.ndarray:
         """Creates a grid storing coordinate points.  Includes coordinate points of the boundary."""
+
+        #check that dimensions are above zero
+        if self.x_dimension <= 0 or self.y_dimension <= 0:
+            print(f"Grid dimensions must be above zero.")
+            quit()
 
         # dimensions +2 to include the coordinates of the boundary cells
         grid_midpoints = np.zeros((self.y_dimension + 2, self.x_dimension + 2, 2))

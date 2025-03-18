@@ -111,3 +111,5 @@ class YDirectionDiffusion(DyDtEquation):
         y_direction_diffusion = (incoming_shortwave_radiation - outgoing_longwave_radiation - y_direction_flux_term) / self.grid.heat_capacity
 
         return y_direction_diffusion
+
+

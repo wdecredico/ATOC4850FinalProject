@@ -12,8 +12,8 @@ class Grid:
         self.midpoints = self.create_grid_midpoints()
         self.x_intersection_points, self.y_intersection_points = self.create_grid_interface_points()
 
-        self.x_segment_length = self.midpoints[0, 1] - self.midpoints[0, 0]
-        self.y_segment_length = self.midpoints[1, 0] - self.midpoints[0, 0]
+        self.x_segment_length = self.midpoints[0, 1, 0] - self.midpoints[0, 0, 0]
+        self.y_segment_length = self.midpoints[0, 0, 1] - self.midpoints[1, 0, 1]
 
         self.temperatures = np.zeros((y_dimension + 2, x_dimension + 2))
         self.boundary_condition: str = ""

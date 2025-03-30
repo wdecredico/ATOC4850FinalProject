@@ -73,20 +73,22 @@ class XDirectionDiffusion(DyDtEquation):
 
     def __call__(self, time: float, temperature: np.ndarray) -> np.ndarray:
         """Calculates temperature diffusion on the x-axis.  Returns a 2d numpy array
-        of diffusion in units of [units here] for each x interface position"""
+        of diffusion (dT/dt) in units of [units here] for each x interface position."""
 
         # temperature change across cells in the x direction
-        dt_dx = (self.grid.temperatures[1:-1, 1:] - self.grid.temperatures[1:-1, :-1]) / self.grid.x_segment_length
+        dt_dx = (temperature[1:-1, 1:] - temperature[1:-1, :-1]) / self.grid.x_segment_length
 
-        x_direction_flux: np.ndarray = -1 * self.diffusion_constant * dt_dx
+        flux: np.ndarray = -1 * self.diffusion_constant * dt_dx
 
-        incoming_shortwave_radiation = Constants.SOLAR_IRRADIANCE / 4 * (1 - Constants.EARTH_ALBEDO)
-        outgoing_longwave_radiation = (1 - Constants.EMISSIVITY / 2) * Constants.STEFAN_BOLTZMANN_CONSTANT * temperature ** 4
-        x_direction_flux_term = (x_direction_flux[:, 1:] - x_direction_flux[:, :-1]) / self.grid.x_segment_length
+        incoming_shortwave_radiation = (Constants.SOLAR_IRRADIANCE/4) * (1-Constants.EARTH_ALBEDO)
+        outgoing_longwave_radiation = (1 - Constants.EMISSIVITY/2) * Constants.STEFAN_BOLTZMANN_CONSTANT * (temperature[1:-1, 1:-1]**4)
+        x_direction_flux_term = (flux[:, 1:] - flux[:, :-1]) / self.grid.x_segment_length
 
-        x_direction_diffusion = (incoming_shortwave_radiation - outgoing_longwave_radiation - x_direction_flux_term) / self.grid.heat_capacity
+        x_direction_diffusion = self.grid.boundary.copy()
+        x_direction_diffusion[1:-1, 1:-1] = (incoming_shortwave_radiation - outgoing_longwave_radiation - x_direction_flux_term) / self.grid.heat_capacity
 
         return x_direction_diffusion
+
 
 
 class YDirectionDiffusion(DyDtEquation):
@@ -100,7 +102,7 @@ class YDirectionDiffusion(DyDtEquation):
             of diffusion in units of [units here] for each y interface position"""
 
         # temperature change across cells in the y direction
-        dt_dy = (self.grid.temperatures[1:, 1:-1] - self.grid.temperatures[:-1, 1:-1]) / self.grid.y_segment_length
+        dt_dy = (self.grid.current_temperatures[1:, 1:-1] - self.grid.current_temperatures[:-1, 1:-1]) / self.grid.y_segment_length
 
         y_direction_flux: np.ndarray = -1 * self.diffusion_constant * dt_dy
 

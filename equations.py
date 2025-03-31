@@ -84,12 +84,27 @@ class XDirectionDiffusion(DyDtEquation):
         outgoing_longwave_radiation = (1 - Constants.EMISSIVITY/2) * Constants.STEFAN_BOLTZMANN_CONSTANT * (temperature[1:-1, 1:-1]**4)
         x_direction_flux_term = (flux[:, 1:] - flux[:, :-1]) / self.grid.x_segment_length
 
-        x_direction_diffusion = self.grid.boundary.copy()
-        x_direction_diffusion[1:-1, 1:-1] = (incoming_shortwave_radiation - outgoing_longwave_radiation - x_direction_flux_term) / self.grid.heat_capacity
+        x_direction_diffusion = np.zeros((self.grid.y_dimension, self.grid.x_dimension))
+        x_direction_diffusion = (incoming_shortwave_radiation - outgoing_longwave_radiation - x_direction_flux_term) / self.grid.heat_capacity
 
         return x_direction_diffusion
 
 
+class XDiffusionNoSun(DyDtEquation):
+
+    def __init__(self, diffusion_constant: float, grid: Grid):
+        self.diffusion_constant = diffusion_constant
+        self.grid = grid
+
+
+    def __call__(self, time: float, temperature: np.ndarray) -> np.ndarray:
+
+        dt_dx = (temperature[1:-1, 1:] - temperature[1:-1, :-1]) / self.grid.x_segment_length
+        flux: np.ndarray = -1 * self.diffusion_constant * dt_dx
+
+        flux_derivative: np.ndarray = (flux[:, 1:] - flux[:, :-1]) / self.grid.x_segment_length
+
+        return -1 * flux_derivative/self.grid.heat_capacity
 
 class YDirectionDiffusion(DyDtEquation):
 

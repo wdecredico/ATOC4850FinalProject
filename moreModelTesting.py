@@ -91,7 +91,7 @@ heat_capacity: np.ndarray = np.full((grid_y_dimension, grid_x_dimension), 22)
 
 # change the model timing
 end_time: float = 5 * Constants.YEARS
-time_step: float = 5 * Constants.DAYS
+time_step: float = 60
 model_times: np.ndarray = np.arange(0, end_time, time_step)
 num_steps: int = 5
 
@@ -112,12 +112,15 @@ y_diffusion = equations.YDirectionDiffusion(diffusion_constant, grid)
 # x_direction_diffusion: np.ndarray = area_runge_kutta_calculator(grid, x_diffusion, time_step, num_steps)
 # x_direction_diffusion: np.ndarray = area_euler_method_calculator(grid, x_diffusion, time_step, num_steps)
 
+diffusion_equation = equations.Diffusion(diffusion_constant, grid)
+diffusion_temperature_change = area_euler_method_calculator(grid, diffusion_equation, time_step, num_steps)
+
 
 no_sun_diffusion = equations.XDiffusionNoSun(diffusion_constant, grid)
 
 x_direction_diffusion: np.ndarray = area_euler_method_calculator(grid, no_sun_diffusion, time_step, num_steps)
 
-some_variable = 7
+literally_just_a_breakpoint = 0
 
 
 

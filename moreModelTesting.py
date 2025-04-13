@@ -71,7 +71,6 @@ def area_euler_method_calculator(grid: Grid, function: equations.DyDtEquation, t
     return y_values
 
 
-
 """Set model parameters, constants and settings:"""
 grid_x_dimension: int = 6
 grid_y_dimension: int = 4

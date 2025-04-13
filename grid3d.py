@@ -17,9 +17,17 @@ class Grid3d:
          self.y,
          self.z) = self._create_midpoints()
 
-        (self.x_interface_points,
-         self.y_interface_points,
-         self.z_interface_points) = self._create_interface_points()
+        (self.x_interface_x,
+         self.x_interface_y,
+         self.x_interface_z) = self._create_x_interface_points()
+
+        (self.y_interface_x,
+         self.y_interface_y,
+         self.y_interface_z) = self._create_y_interface_points()
+
+        (self.z_interface_x,
+         self.z_interface_y,
+         self.z_interface_z) = self._create_z_interface_points()
 
         # Temperature arrays include boundaries. Arrays are in order of cartesian coordinates, (x, y, z)
         self.initial_temperatures = np.zeros((self.num_x_cells+2, self.num_y_cells+2, self.num_z_cells+2))
@@ -88,6 +96,7 @@ class Grid3d:
 
         return self.current_temperatures[1:-1, 1:-1, 1:-1]
 
+
     def _input_array_not_equal_grid_dimensions(self, array) -> bool:
         """Checks if an array is not the same shape as the grid dimensions.
             If the inputted array is not the same shape as the grid dimensions, return True.
@@ -127,9 +136,78 @@ class Grid3d:
         y_axis = np.linspace(low_y_coordinate, high_y_coordinate, self.num_y_cells)
         z_axis = np.linspace(low_z_coordinate, high_z_coordinate, self.num_z_cells)
 
-        coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='xy')
+        coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='ij')
 
         return coordinates
+
+    def _create_x_interface_points(self):
+
+        if self._invalid_grid_shape():
+            print("Grid is not of valid size")
+            quit()
+
+        low_x_coordinate = -1 * self.num_x_cells / 2 * self.x_axis_cell_length
+        high_x_coordinate = self.num_x_cells / 2 * self.x_axis_cell_length
+
+        low_y_coordinate = -1 * (self.num_y_cells - 1) / 2 * self.y_axis_cell_length
+        high_y_coordinate = (self.num_y_cells - 1) / 2 * self.y_axis_cell_length
+
+        low_z_coordinate = self.z_axis_cell_length / 2
+        high_z_coordinate = (self.z_axis_cell_length * self.num_z_cells) - (self.z_axis_cell_length / 2)
+
+        x_axis = np.linspace(low_x_coordinate, high_x_coordinate, self.num_x_cells)
+        y_axis = np.linspace(low_y_coordinate, high_y_coordinate, self.num_y_cells)
+        z_axis = np.linspace(low_z_coordinate, high_z_coordinate, self.num_z_cells)
+
+        x_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='ij')
+
+        return x_interface_coordinates
+    def _create_y_interface_points(self):
+
+        if self._invalid_grid_shape():
+            print("Grid is not of valid size")
+            quit()
+
+        low_x_coordinate = -1 * (self.num_x_cells - 1) / 2 * self.x_axis_cell_length
+        high_x_coordinate = (self.num_x_cells - 1) / 2 * self.x_axis_cell_length
+
+        low_y_coordinate = -1 * self.num_y_cells / 2 * self.y_axis_cell_length
+        high_y_coordinate = self.num_y_cells / 2 * self.y_axis_cell_length
+
+        low_z_coordinate = self.z_axis_cell_length / 2
+        high_z_coordinate = (self.z_axis_cell_length * self.num_z_cells) - (self.z_axis_cell_length / 2)
+
+        x_axis = np.linspace(low_x_coordinate, high_x_coordinate, self.num_x_cells)
+        y_axis = np.linspace(low_y_coordinate, high_y_coordinate, self.num_y_cells)
+        z_axis = np.linspace(low_z_coordinate, high_z_coordinate, self.num_z_cells)
+
+        y_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='ij')
+        return y_interface_coordinates
+    def _create_z_interface_points(self):
+
+        if self._invalid_grid_shape():
+            print("Grid is not of valid size")
+            quit()
+
+        low_x_coordinate = -1 * (self.num_x_cells - 1) / 2 * self.x_axis_cell_length
+        high_x_coordinate = (self.num_x_cells - 1) / 2 * self.x_axis_cell_length
+
+        low_y_coordinate = -1 * (self.num_y_cells - 1) / 2 * self.y_axis_cell_length
+        high_y_coordinate = (self.num_y_cells - 1) / 2 * self.y_axis_cell_length
+
+        low_z_coordinate = 0
+        high_z_coordinate = self.z_axis_cell_length * self.num_z_cells
+
+        x_axis = np.linspace(low_x_coordinate, high_x_coordinate, self.num_x_cells)
+        y_axis = np.linspace(low_y_coordinate, high_y_coordinate, self.num_y_cells)
+        z_axis = np.linspace(low_z_coordinate, high_z_coordinate, self.num_z_cells)
+
+        z_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='ij')
+
+        return z_interface_coordinates
+
+
+
     def _create_interface_points(self):
 
         if self._invalid_grid_shape():
@@ -152,7 +230,7 @@ class Grid3d:
             y_axis = np.linspace(low_y_coordinate, high_y_coordinate, self.num_y_cells)
             z_axis = np.linspace(low_z_coordinate, high_z_coordinate, self.num_z_cells)
 
-            x_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='xy')
+            x_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='ij')
 
             return x_interface_coordinates
 
@@ -171,7 +249,7 @@ class Grid3d:
             y_axis = np.linspace(low_y_coordinate, high_y_coordinate, self.num_y_cells)
             z_axis = np.linspace(low_z_coordinate, high_z_coordinate, self.num_z_cells)
 
-            y_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='xy')
+            y_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='ij')
             return y_interface_coordinates
 
         def create_z_interface_points():
@@ -189,7 +267,7 @@ class Grid3d:
             y_axis = np.linspace(low_y_coordinate, high_y_coordinate, self.num_y_cells)
             z_axis = np.linspace(low_z_coordinate, high_z_coordinate, self.num_z_cells)
 
-            z_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='xy')
+            z_interface_coordinates = np.meshgrid(x_axis, y_axis, z_axis, indexing='ij')
 
             return z_interface_coordinates
 

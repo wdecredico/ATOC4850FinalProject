@@ -8,8 +8,10 @@ class Constants:
 
     SOLAR_IRRADIANCE = 1361 #units of W/m^2
 
-    SILICON_ROCK_HEAT_CAPACITY = 712  # in J /kg / K
+    SILICON_SPECIFIC_HEAT = 712  # in J /kg / K
     SILICON_ROCK_DENSITY = 2650  # in kg/m^3
+
+
     WATER_HEAT_CAPACITY = 4000  # in J /kg / K
     WATER_DENSITY = 1000  # in kg/m^3
 

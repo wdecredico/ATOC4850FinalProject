@@ -12,7 +12,7 @@ class Constants:
     SILICON_ROCK_DENSITY = 2650  # in kg/m^3
 
 
-    WATER_HEAT_CAPACITY = 4000  # in J /kg / K
+    WATER_SPECIFIC_HEAT = 4000  # in J /kg / K
     WATER_DENSITY = 1000  # in kg/m^3
 
     DAYS_PER_YEAR = 365.25

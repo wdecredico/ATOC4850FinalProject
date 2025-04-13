@@ -86,7 +86,8 @@ boundary_condition: str = 'dirichlet'
 boundary: np.ndarray = np.full((grid_y_dimension + 2, grid_x_dimension + 2),
                                280)  # Constant boundary temperature of 280K
 
-heat_capacity: np.ndarray = np.full((grid_y_dimension, grid_x_dimension), 22)
+silicon_heat_capacity = Constants.SILICON_SPECIFIC_HEAT * Constants.SILICON_ROCK_DENSITY * grid_cell_size
+heat_capacity: np.ndarray = np.full((grid_y_dimension, grid_x_dimension), silicon_heat_capacity)
 
 # change the model timing
 end_time: float = 5 * Constants.YEARS
